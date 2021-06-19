@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.personal.hilt"
-        minSdkVersion 16
+        minSdkVersion 21 // updated from 16 to check compose for navigation
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
