@@ -1,4 +1,4 @@
-package com.personal.hilt
+package com.personal.hilt.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
+import com.personal.hilt.R
 
 /*
 * in nav_graph.xml

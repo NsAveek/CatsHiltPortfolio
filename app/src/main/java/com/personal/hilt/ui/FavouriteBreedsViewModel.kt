@@ -1,4 +1,4 @@
-package com.personal.hilt
+package com.personal.hilt.ui
 
 import androidx.lifecycle.ViewModel
 
