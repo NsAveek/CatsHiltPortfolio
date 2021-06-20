@@ -10,13 +10,44 @@
         android:name="com.personal.hilt.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
-        <action
-            android:id="@+id/action_mainFragment_to_detailsFragment"
-            app:destination="@id/detailsFragment" />
+<!--        <action-->
+<!--            android:id="@+id/action_mainFragment_to_detailsFragment"-->
+<!--            app:destination="@id/detailsFragment" />-->
+
+        <!--        <action android:id="@+id/next_action"-->
+<!--            app:destination="@id/detailsFragment"-->
+<!--            app:enterAnim="@anim/slide_in_right"-->
+<!--            app:exitAnim="@anim/slide_out_left"-->
+<!--            app:popEnterAnim="@anim/slide_in_left"-->
+<!--            app:popExitAnim="@anim/slide_out_right" />-->
+
+        <action android:id="@+id/next_action"
+            app:destination="@id/detailsFragment"
+            />
+
     </fragment>
     <fragment
         android:id="@+id/detailsFragment"
         android:name="com.personal.hilt.DetailsFragment"
         android:label="fragment_details"
-        tools:layout="@layout/fragment_details" />
+        tools:layout="@layout/fragment_details" >
+        <action
+            android:id="@+id/action_detailsFragment_to_favouriteBreedsFragment"
+            app:destination="@id/favouriteBreedsFragment" />
+
+        <argument
+            android:name="flowStepNumber"
+            app:argType="integer"
+            android:defaultValue="-1"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/favouriteBreedsFragment"
+        android:name="com.personal.hilt.FavouriteBreedsFragment"
+        android:label="favourite_breeds_fragment"
+        tools:layout="@layout/favourite_breeds_fragment" >
+        <action
+            android:id="@+id/action_favouriteBreedsFragment_to_mainFragment"
+            app:popUpTo="@id/mainFragment" />
+    </fragment>
 </navigation>
