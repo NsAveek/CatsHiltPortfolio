@@ -1,4 +1,4 @@
-package com.personal.hilt.ui
+package com.personal.hilt.ui.favourite
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
