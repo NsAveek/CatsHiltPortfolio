@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import com.personal.hilt.Injection
 import com.personal.hilt.databinding.FragmentMainBinding
 import kotlinx.coroutines.Job
@@ -55,6 +58,9 @@ class MainFragment : Fragment() {
                 adapter.submitData(it)
             }
         }
+        binding.retryButton.setOnClickListener{
+            adapter.retry()
+        }
 
         // region action button
 //
@@ -92,6 +98,32 @@ class MainFragment : Fragment() {
             header = CatsLoadStateAdapter{adapter.retry()},
             footer = CatsLoadStateAdapter{adapter.retry()}
         )
+        adapter.addLoadStateListener {
+            loadState -> val isListEmpty = loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
+            showEmptyList(isListEmpty)
+            // Only show the list if refresh succeeds.
+            binding.list.isVisible = loadState.source.refresh is LoadState.NotLoading
+            // Show loading spinner during initial load or refresh.
+            binding.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+            // Show the retry state if initial load or refresh fails.
+            binding.retryButton.isVisible = loadState.source.refresh is LoadState.Error
+
+            val errorState = loadState.source.append as? LoadState.Error
+                ?: loadState.source.prepend as? LoadState.Error
+                ?: loadState.source.refresh as? LoadState.Error
+            errorState?.let {
+                Toast.makeText(
+                    requireContext(),
+                    "\uD83D\uDE28 Wooops ${it.error}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+
+
+
+
     }
 
     private fun showEmptyList(show: Boolean) {

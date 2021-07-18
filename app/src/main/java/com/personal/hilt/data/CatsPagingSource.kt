@@ -12,7 +12,6 @@ private const val CATS_STARTING_PAGE_INDEX = 1
 class CatsPagingSource (private val service: CatsDataService) : PagingSource<Int, CatsDataResponseItem> () {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CatsDataResponseItem> {
         val nextPage = params.key?: CATS_STARTING_PAGE_INDEX
-//        val apiQuery = query // TODO : Check IN_QUALIFIER
         return try {
 
             val response = service.getCats(NETWORK_PAGE_SIZE,nextPage)

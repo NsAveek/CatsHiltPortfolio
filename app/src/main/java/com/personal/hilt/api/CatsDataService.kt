@@ -1,5 +1,6 @@
 package com.personal.hilt.api
 
+import com.personal.hilt.data.CatsDataRepository.Companion.NETWORK_PAGE_SIZE
 import com.personal.hilt.model.CatsDataResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -31,7 +32,7 @@ interface CatsDataService {
     }
 
     @GET("search")
-    suspend fun getCats(@Query("limit") pageSize: Int,
+    suspend fun getCats(@Query("limit") pageSize: Int = NETWORK_PAGE_SIZE,
                         @Query("page_number") pageNumber: Int) : CatsDataResponse
 
 
