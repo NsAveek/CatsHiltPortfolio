@@ -49,7 +49,7 @@ class MainFragment : Fragment() {
 //        val view = inflater.inflate(R.layout.fragment_main, container, false)
 
         binding = FragmentMainBinding.inflate(inflater)
-        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory())
+        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory(this.requireContext()))
             .get(MainFragmentViewModel::class.java)
 
         getCatsJob?.cancel()

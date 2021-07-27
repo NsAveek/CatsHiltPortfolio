@@ -1,5 +1,11 @@
 package com.personal.hilt.model
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "breed")
 data class Breed(
     val adaptability: Int,
     val affection_level: Int,
@@ -16,7 +22,9 @@ data class Breed(
     val hairless: Int,
     val health_issues: Int,
     val hypoallergenic: Int,
-    val id: String,
+    @PrimaryKey
+    @ColumnInfo(name = "breed_id") val id: String,
+    @ColumnInfo(name = "cats_id_fkey") val catsId: String,
     val indoor: Int,
     val intelligence: Int,
     val life_span: String,
