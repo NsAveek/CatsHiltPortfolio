@@ -51,7 +51,7 @@ class CatsRemoteMediator(private val service : CatsDataService,
                 val prevKey = if (page == CATS_STARTING_PAGE_INDEX) null else page-1
                 val nextKey = if (endOfPaginationReached) null else page+1
                 val keys = catsDataResponseItemList.map {
-                    RemoteKeys(catsId = it.id.toLong(), prevKey, nextKey)
+                    RemoteKeys(catsId = it.id, prevKey, nextKey)
                 }
                 catsDatabase.remoteKeysDao().insertAll(keys)
                 catsDatabase.catsDao().insertAll(catsDataResponseItemList)
@@ -73,7 +73,7 @@ class CatsRemoteMediator(private val service : CatsDataService,
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, CatsDataResponseItem>) : RemoteKeys?{
         return state.pages.lastOrNull(){ it.data.isNotEmpty() }?.data?.lastOrNull()?.let {
-            catsItem -> catsDatabase.remoteKeysDao().remoteKeysCatsId(catsItem.id.toLong())
+            catsItem -> catsDatabase.remoteKeysDao().remoteKeysCatsId(catsItem.id)
         }
     }
     private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, CatsDataResponseItem>): RemoteKeys? {
@@ -82,7 +82,7 @@ class CatsRemoteMediator(private val service : CatsDataService,
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
             ?.let { catsItem ->
                 // Get the remote keys of the first items retrieved
-                catsDatabase.remoteKeysDao().remoteKeysCatsId(catsItem.id.toLong())
+                catsDatabase.remoteKeysDao().remoteKeysCatsId(catsItem.id)
             }
     }
     private suspend fun getRemoteKeyClosestToCurrentPosition(
@@ -92,7 +92,7 @@ class CatsRemoteMediator(private val service : CatsDataService,
         // Get the item closest to the anchor position
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { catsId ->
-                catsDatabase.remoteKeysDao().remoteKeysCatsId(catsId.toLong())
+                catsDatabase.remoteKeysDao().remoteKeysCatsId(catsId)
             }
         }
     }
