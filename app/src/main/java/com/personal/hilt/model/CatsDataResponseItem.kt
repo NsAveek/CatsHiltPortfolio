@@ -1,18 +1,19 @@
 package com.personal.hilt.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "items")
-data class CatsDataResponseItem(
+data class CatsDataResponseItem @JvmOverloads constructor(
     @PrimaryKey
-    @field:SerializedName("id") @ColumnInfo(name = "cats_id") val id: String,
-//    val breeds: ArrayList<Breed>,
-//    val categories: ArrayList<Category>,
-    @field:SerializedName("height") val height: Int,
-    @field:SerializedName("url") val url: String,
-    @field:SerializedName("width") val width: Int
+    @ColumnInfo(name = "cats_id") var id: String = "",
+    var height: Int = 0,
+    var url: String = "",
+    var width: Int = 0,
+    @Ignore val breeds: ArrayList<Breed>, // Since Room does not support auto insertion,
+//    @Ignore val breeds: String, // Since Room does not support auto insertion,
+    @Ignore val categories: ArrayList<Category> // We need to insert it separately
 )
+{
+    constructor() : this(id="", height=0, url="", width=0,breeds = arrayListOf(), categories = arrayListOf())
+}

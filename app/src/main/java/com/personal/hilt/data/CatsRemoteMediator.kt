@@ -7,7 +7,7 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.personal.hilt.api.CatsDataService
 import com.personal.hilt.database.CatsDatabase
-import com.personal.hilt.database.RemoteKeys
+import com.personal.hilt.database.model.RemoteKeys
 import com.personal.hilt.model.CatsDataResponseItem
 import retrofit2.HttpException
 import java.io.IOException
@@ -53,8 +53,12 @@ class CatsRemoteMediator(private val service : CatsDataService,
                 val keys = catsDataResponseItemList.map {
                     RemoteKeys(catsId = it.id, prevKey, nextKey)
                 }
+//                val breeds = catsDataResponseItemList.forEach { data ->
+////                    data.breeds.forEach{breed -> breed.catsId = data.id }
+//                }
                 catsDatabase.remoteKeysDao().insertAll(keys)
                 catsDatabase.catsDao().insertAll(catsDataResponseItemList)
+//                catsDatabase.catsDao().insertAllBreeds(catsDataResponseItemList.first().breeds)
             }
             return MediatorResult.Success(endOfPaginationReached)
         } catch (exception: IOException) {

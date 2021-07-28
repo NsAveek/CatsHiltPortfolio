@@ -6,17 +6,21 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.personal.hilt.model.Breed
 import com.personal.hilt.model.CatsDataResponseItem
 import java.util.concurrent.Flow
 
 @Dao
-interface CatsDao {
+abstract class CatsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(repos: List<CatsDataResponseItem>)
+    abstract suspend fun insertAll(catsDataLists: List<CatsDataResponseItem>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAllBreeds(breedsList: List<Breed>)// or BreedDao interface
 
     @Query("DELETE FROM items")
-    suspend fun clearRepos()
+    abstract suspend fun clearRepos()
 
     @Query("SELECT * FROM items")
-    fun getAllCatsDataFromDb() : PagingSource<Int,CatsDataResponseItem>
+    abstract fun getAllCatsDataFromDb() : PagingSource<Int,CatsDataResponseItem>
 }
