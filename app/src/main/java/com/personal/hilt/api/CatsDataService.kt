@@ -32,8 +32,11 @@ interface CatsDataService {
     }
 
     @GET("search")
+    //@Query("has_breeds") hasBreeds : Boolean = true,
     suspend fun getCats(@Query("limit") pageSize: Int = NETWORK_PAGE_SIZE,
-                        @Query("page_number") pageNumber: Int) : CatsDataResponse
+                        @Query("page") pageNumber: Int,
+                        @Query("include_categories") includeCategories : Boolean = true,
+                        @Query("mime_types") mimeType: String = "png",) : CatsDataResponse
 
 
 }

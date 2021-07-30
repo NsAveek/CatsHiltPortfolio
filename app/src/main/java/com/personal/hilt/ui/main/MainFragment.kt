@@ -13,7 +13,10 @@ import androidx.paging.LoadState
 import com.personal.hilt.Injection
 import com.personal.hilt.databinding.FragmentMainBinding
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 /*
@@ -94,20 +97,25 @@ class MainFragment : Fragment() {
     }
 
     private fun initAdapter(){
-        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
-            header = CatsLoadStateAdapter{adapter.retry()},
+//        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+//            header = CatsLoadStateAdapter{adapter.retry()},
+//            footer = CatsLoadStateAdapter{adapter.retry()}
+//        )
+        binding.list.adapter = adapter.withLoadStateFooter(
             footer = CatsLoadStateAdapter{adapter.retry()}
         )
         adapter.addLoadStateListener {
+            // show empty list
             loadState -> val isListEmpty = loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
             showEmptyList(isListEmpty)
-            // Only show the list if refresh succeeds.
-            binding.list.isVisible = loadState.source.refresh is LoadState.NotLoading
+            // Only show the list if refresh succeeds, either from the the local db or the remote.
+            binding.list.isVisible = loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
             // Show loading spinner during initial load or refresh.
-            binding.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+            binding.progressBar.isVisible = loadState.mediator?.refresh is LoadState.Loading
             // Show the retry state if initial load or refresh fails.
-            binding.retryButton.isVisible = loadState.source.refresh is LoadState.Error
+            binding.retryButton.isVisible = loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
 
+            // Toast on any error, regardless of whether it came from RemoteMediator or PagingSource
             val errorState = loadState.source.append as? LoadState.Error
                 ?: loadState.source.prepend as? LoadState.Error
                 ?: loadState.source.refresh as? LoadState.Error
@@ -119,11 +127,16 @@ class MainFragment : Fragment() {
                 ).show()
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch{
+        // Scroll to top when the list is refreshed from network.
 
-
-
-
-
+        adapter.loadStateFlow
+            // Only emit when REFRESH LoadState for RemoteMediator changes.
+            .distinctUntilChangedBy { it.refresh }
+            // Only react to cases where Remote REFRESH completes i.e., NotLoading.
+            .filter { it.refresh is LoadState.NotLoading }
+            .collect { binding.list.scrollToPosition(0) }
+        }
     }
 
     private fun showEmptyList(show: Boolean) {

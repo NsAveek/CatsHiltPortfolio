@@ -8,6 +8,8 @@ import androidx.room.withTransaction
 import com.personal.hilt.api.CatsDataService
 import com.personal.hilt.database.CatsDatabase
 import com.personal.hilt.database.model.RemoteKeys
+import com.personal.hilt.model.Breed
+import com.personal.hilt.model.Category
 import com.personal.hilt.model.CatsDataResponseItem
 import retrofit2.HttpException
 import java.io.IOException
@@ -53,12 +55,31 @@ class CatsRemoteMediator(private val service : CatsDataService,
                 val keys = catsDataResponseItemList.map {
                     RemoteKeys(catsId = it.id, prevKey, nextKey)
                 }
-//                val breeds = catsDataResponseItemList.forEach { data ->
-////                    data.breeds.forEach{breed -> breed.catsId = data.id }
-//                }
+
+                catsDataResponseItemList.map {
+                    with(it){
+                        categories.map { categories ->
+                            categories.catsId = it.id
+                        }
+                        breeds.map { breed ->
+                            breed.catsId = it.id
+                        }
+                    }
+                }
                 catsDatabase.remoteKeysDao().insertAll(keys)
                 catsDatabase.catsDao().insertAll(catsDataResponseItemList)
-//                catsDatabase.catsDao().insertAllBreeds(catsDataResponseItemList.first().breeds)
+//                catsDatabase.catsDao().insertAllBreeds(
+//                    catsDataResponseItemList.findBreedsList(catsDataResponseItemList.first())
+//                )
+//                catsDatabase.catsDao().insertAllCategories(
+//                    catsDataResponseItemList.findCategoriesList(catsDataResponseItemList.first())
+//                )
+                catsDatabase.catsDao().insertAllBreeds(
+                    catsDataResponseItemList.first().breeds
+                )
+                catsDatabase.catsDao().insertAllCategories(
+                    catsDataResponseItemList.first().categories
+                )
             }
             return MediatorResult.Success(endOfPaginationReached)
         } catch (exception: IOException) {
@@ -66,6 +87,20 @@ class CatsRemoteMediator(private val service : CatsDataService,
         } catch (exception: HttpException) {
             return MediatorResult.Error(exception)
         }
+    }
+
+
+    private fun List<CatsDataResponseItem>.findBreedsList(data : CatsDataResponseItem) : List<Breed>{
+        data.breeds.forEach{
+            it.catsId = data.id
+        }
+        return data.breeds
+    }
+    private fun List<CatsDataResponseItem>.findCategoriesList(data : CatsDataResponseItem) : List<Category>{
+        data.categories.forEach{
+            it.catsId = data.id
+        }
+        return data.categories
     }
 
     /*
