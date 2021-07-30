@@ -31,7 +31,7 @@ class CatsRemoteMediator(private val service : CatsDataService,
                     ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys!=null)
             }
             LoadType.PREPEND -> {
-                val remoteKeys = getRemoteKeyForLastItem(state)
+                val remoteKeys = getRemoteKeyForFirstItem(state)
                 remoteKeys?.prevKey
                     ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys!=null)
             }
@@ -90,12 +90,12 @@ class CatsRemoteMediator(private val service : CatsDataService,
     }
 
 
-    private fun List<CatsDataResponseItem>.findBreedsList(data : CatsDataResponseItem) : List<Breed>{
-        data.breeds.forEach{
-            it.catsId = data.id
-        }
-        return data.breeds
-    }
+//    private fun <T> List<CatsDataResponseItem>.findBreedsList(data : CatsDataResponseItem) : List<T>{
+//        data.b.forEach{
+//            it.catsId = data.id
+//        }
+//        return data.breeds
+//    }
     private fun List<CatsDataResponseItem>.findCategoriesList(data : CatsDataResponseItem) : List<Category>{
         data.categories.forEach{
             it.catsId = data.id
