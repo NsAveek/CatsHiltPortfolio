@@ -7,57 +7,41 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import com.personal.hilt.Injection
 import com.personal.hilt.databinding.FragmentMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-/*
-* in nav_graph.xml
-* <action android:id="@+id/next_action"
-            app:destination="@id/detailsFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-
-* is required to initiate an action
-* Typically, to go from source to destination, we require action
-* You may define animation from the code itself if not from xml
-* For type-safe data passing, we require safe-args plugin integration. There are some known issues, can be solved using gradle 7.0
-* */
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
     private var getCatsJob : Job? = null
-    private lateinit var viewModel : MainFragmentViewModel
+    private val mainFragmentViewModel by viewModels<MainFragmentViewModel>()
     private lateinit var binding : FragmentMainBinding
     private val adapter = CatsDataAdapter()
+//    @Inject lateinit var viewModelFactory: ViewModelFactory
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-//        val view = inflater.inflate(R.layout.fragment_main, container, false)
 
         binding = FragmentMainBinding.inflate(inflater)
-        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory(this.requireContext()))
-            .get(MainFragmentViewModel::class.java)
+
+//        viewModel = ViewModelProvider(this, viewModelFactory)
+//            .get(MainFragmentViewModel::class.java)
 
         getCatsJob?.cancel()
         getCatsJob = lifecycleScope.launch {
-            viewModel.getCatsData().collectLatest {
+            mainFragmentViewModel.getCatsData().collectLatest {
                 adapter.submitData(it)
             }
         }
@@ -65,42 +49,12 @@ class MainFragment : Fragment() {
             adapter.retry()
         }
 
-        // region action button
-//
-//        val options = navOptions {
-//            anim {
-//                enter = R.anim.slide_in_right
-//                exit = R.anim.slide_out_left
-//                popEnter = R.anim.slide_in_left
-//                popExit = R.anim.slide_out_right
-//            }
-//        }
-////        val actionBtn = view.findViewById<Button>(R.id.action_btn_to_details_fragment)
-//        val actionBtn = binding.actionBtnToDetailsFragment
-////        actionBtn?.setOnClickListener ( Navigation.createNavigateOnClickListener(R.id.next_action, null))
-//
-////            Same thing another implementation
-////            findNavController().navigate(R.id.action_mainFragment_to_detailsFragment, null, options)
-//
-//        actionBtn.setOnClickListener{ // To pass the data, you need action
-//            val flowStepArg = 10
-//            val action = MainFragmentDirections.nextAction(flowStepArg)
-//            findNavController().navigate(action,options)
-//
-//        }
-
-        // endregion
-
         initAdapter()
 
         return binding.root
     }
 
     private fun initAdapter(){
-//        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
-//            header = CatsLoadStateAdapter{adapter.retry()},
-//            footer = CatsLoadStateAdapter{adapter.retry()}
-//        )
         binding.list.adapter = adapter.withLoadStateFooter(
             footer = CatsLoadStateAdapter{adapter.retry()}
         )
@@ -108,14 +62,11 @@ class MainFragment : Fragment() {
             // show empty list
             loadState -> val isListEmpty = loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
             showEmptyList(isListEmpty)
-            // Only show the list if refresh succeeds, either from the the local db or the remote.
             binding.list.isVisible = loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
-            // Show loading spinner during initial load or refresh.
             binding.progressBar.isVisible = loadState.mediator?.refresh is LoadState.Loading
-            // Show the retry state if initial load or refresh fails.
             binding.retryButton.isVisible = loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
 
-            // Toast on any error, regardless of whether it came from RemoteMediator or PagingSource
+
             val errorState = loadState.source.append as? LoadState.Error
                 ?: loadState.source.prepend as? LoadState.Error
                 ?: loadState.source.refresh as? LoadState.Error
@@ -127,16 +78,6 @@ class MainFragment : Fragment() {
                 ).show()
             }
         }
-//        viewLifecycleOwner.lifecycleScope.launch{
-//        // Scroll to top when the list is refreshed from network.
-//
-//        adapter.loadStateFlow
-//            // Only emit when REFRESH LoadState for RemoteMediator changes.
-//            .distinctUntilChangedBy { it.refresh }
-//            // Only react to cases where Remote REFRESH completes i.e., NotLoading.
-//            .filter { it.refresh is LoadState.NotLoading }
-//            .collect { binding.list.scrollToPosition(0) }
-//        }
     }
 
     private fun showEmptyList(show: Boolean) {
@@ -151,15 +92,6 @@ class MainFragment : Fragment() {
 
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MainFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             MainFragment().apply {

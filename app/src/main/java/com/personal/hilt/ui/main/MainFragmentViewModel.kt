@@ -8,10 +8,15 @@ import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.personal.hilt.data.CatsDataRepository
 import com.personal.hilt.model.UiModel
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class MainFragmentViewModel ( private val repository: CatsDataRepository) : ViewModel() {
+@HiltViewModel
+class MainFragmentViewModel @Inject constructor( private val repository: CatsDataRepository) : ViewModel() {
     fun getCatsData() : Flow<PagingData<UiModel>>{
         return repository.getCatsStream().map {
             pagingData -> pagingData.map { UiModel.Response(it) }

@@ -15,7 +15,6 @@ data class CatsDataResponseItem @JvmOverloads constructor(
     var width: Int = 0,
     @Ignore
     @field:SerializedName("breeds") val breeds: ArrayList<Breed>, // Since Room does not support auto insertion,
-//    @Ignore val breeds: String, // Since Room does not support auto insertion,
     @Ignore
     @field:SerializedName("categories") val categories: ArrayList<Category> // We need to insert it separately
 )

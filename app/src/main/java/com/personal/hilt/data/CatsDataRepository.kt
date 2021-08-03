@@ -9,6 +9,7 @@ import com.personal.hilt.database.CatsDatabase
 import com.personal.hilt.model.CatsDataResponse
 import com.personal.hilt.model.CatsDataResponseItem
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 class CatsDataRepository (private val service : CatsDataService, private val database : CatsDatabase){
 
@@ -27,12 +28,10 @@ class CatsDataRepository (private val service : CatsDataService, private val dat
             remoteMediator = CatsRemoteMediator(service,database),
             pagingSourceFactory = {database.catsDao().getAllCatsDataFromDb()}).flow
     }
-    //A
     // JumpThreshold
     // MAX_BOUND
 
     companion object {
         const val NETWORK_PAGE_SIZE = 20
     }
-
 }

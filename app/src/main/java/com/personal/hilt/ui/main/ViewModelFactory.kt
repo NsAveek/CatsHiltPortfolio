@@ -19,11 +19,12 @@ package com.personal.hilt.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.personal.hilt.data.CatsDataRepository
+import javax.inject.Inject
 
 /**
  * Factory for ViewModels
  */
-class ViewModelFactory(private val repository: CatsDataRepository) : ViewModelProvider.Factory {
+class ViewModelFactory @Inject constructor (private val repository: CatsDataRepository) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainFragmentViewModel::class.java)) {
